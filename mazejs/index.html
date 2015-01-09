@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <script>
+            var cols, rows, cellSize;
+            cols = 15;
+            rows = 10;
+            cellSize = 80;
+
+            var game = function(canvas, cols, rows, cellSize) {
+                this.canvas = document.getElementById(canvas);
+                this.context = this.canvas.getContext("2d");
+                this.cols = cols;
+                this.rows = rows;
+                this.cellSize = cellSize;
+                this.map = document.createElement('canvas');
+                this.map.width = this.cols * this.cellSize;
+                this.map.height = this.rows * this.cellSize;
+                this.mapContext = this.map.getContext("2d");
+                this.playerX = 0;
+                this.playerY = 0;
+                this.playerSize = 32;
+                this.controls = {
+                    up:false,
+                    down:false,
+                    left:false,
+                    right:false
+                };
+                this.lastPlayerDirectionId = 0;
+            };
+            game.prototype.init = function() {
+                this.genMaze();
+                this.drawMaze();
+            }
+            
+            game.prototype.setPlayerImage = function(img) {
+                this.playerImg = img;
+            }
+            
+            game.prototype.genMaze = function() {
+                this.verWalls = [];
+                this.horWalls = [];
+                var stack = [];
+                var visited = [];
+                var isVisited = function(row, col) {
+                    return visited.indexOf(row * this.cols + col) >= 0 ? true : false;
+                }
+                var getUnknowNeighbors = function(row, col) {
+                    var out = [];
+                    if (row > 0 && !isVisited(row - 1, col)) {
+                        out.push({row: row - 1, col: col});
+                    }
+                    if (row < this.rows - 1 && !isVisited(row + 1, col)) {
+                        out.push({row: row + 1, col: col});
+                    }
+                    if (col > 0 && !isVisited(row, col - 1)) {
+                        out.push({row: row, col: col - 1});
+                    }
+                    if (col < this.cols - 1 && !isVisited(row, col + 1)) {
+                        out.push({row: row, col: col + 1});
+                    }
+                    return out;
+                }
+                var currentCell = {row: 0, col: 0};
+                //close all walls
+                for (var i = 0; i < this.rows; i++) {
+                    this.verWalls[i] = [];
+                    this.horWalls[i] = [];
+                    for (var j = 0; j < this.cols; j++) {
+                        this.verWalls[i][j] = 1;
+                        this.horWalls[i][j] = 1;
+                    }
+                }
+                while (visited.length < this.cols * this.rows) {
+                    var neighbors = getUnknowNeighbors(currentCell.row, currentCell.col);
+                    if (neighbors.length > 0) {                            
+                        var rand = Math.floor(Math.random() * neighbors.length);
+                        if (currentCell.col < neighbors[rand].col) {
+                            this.verWalls[currentCell.row][currentCell.col] = 0;
+                        }
+                        if (currentCell.col > neighbors[rand].col) {
+                            this.verWalls[currentCell.row][currentCell.col - 1] = 0;
+                        }
+                        if (currentCell.row < neighbors[rand].row) {
+                            this.horWalls[currentCell.row][currentCell.col] = 0;
+                        }
+                        if (currentCell.row > neighbors[rand].row) {
+                            this.horWalls[currentCell.row - 1][currentCell.col] = 0;
+                        }
+                        stack.push(currentCell);
+                        currentCell = neighbors[rand];
+                        if (!isVisited(currentCell.row, currentCell.col)) {
+                            visited.push(currentCell.row * this.cols + currentCell.col);
+                        }
+                    } else {
+                        if (stack.length > 0) {
+                            currentCell = stack.pop();
+                        }
+                    }
+                }
+            }
+            
+            game.prototype.drawMaze = function() {
+                for (var i = 0; i < this.rows; i++) {
+                    for (var j = 0; j < this.cols; j++) {
+                        if (this.verWalls[i][j] == 1) {
+                            this.mapContext.beginPath();
+                            this.mapContext.moveTo((j + 1) * this.cellSize, i * this.cellSize);
+                            this.mapContext.lineTo((j + 1) * this.cellSize, (i + 1) * this.cellSize);
+                            this.mapContext.stroke();
+                        }
+                        if (this.horWalls[i][j] == 1) {
+                            this.mapContext.beginPath();
+                            this.mapContext.moveTo(j * this.cellSize, (i + 1) * this.cellSize);
+                            this.mapContext.lineTo((j + 1) * this.cellSize, (i + 1) * this.cellSize);
+                            this.mapContext.stroke();
+                        }
+                    }
+                }
+            }
+            
+            game.prototype.drawMap = function(left, top) {
+                this.context.drawImage(this.map, 0 - left, 0 - top, this.map.width, this.map.height);
+            }
+            
+            game.prototype.drawPlayer = function (left, top) {
+                var d = new Date();
+                var n = d.getMilliseconds();
+                var step = (Math.round(n / 100) % 3) * 64;
+                if (this.controls.up) {
+                    this.lastPlayerDirectionId = 192;
+                } else if(this.controls.down) {
+                    this.lastPlayerDirectionId = 0;
+                } else if(this.controls.left) {
+                    this.lastPlayerDirectionId = 64;
+                } else if(this.controls.right) {
+                    this.lastPlayerDirectionId = 128;
+                } else {
+                    step = 64;
+                }
+                this.context.drawImage(this.playerImg, step, this.lastPlayerDirectionId, 64, 64, this.playerX - left, this.playerY - top, this.playerSize, this.playerSize);
+            }
+            
+            game.prototype.calculateViewport = function () {
+                var top, left;
+                left = this.playerX - (this.canvas.width / 2);
+                if (left < 0) {
+                    left = 0;
+                }
+                if (left > this.map.width - this.canvas.width) {
+                    left = this.map.width - this.canvas.width;
+                }
+                top = this.playerY - (this.canvas.height / 2);
+                if (top < 0) {
+                    top = 0;
+                }
+                if (top > this.map.height - this.canvas.height ) {
+                    top = this.map.height - this.canvas.height;
+                }
+                return {top: top, left: left};
+            }
+            
+            game.prototype.move = function() {
+                var row, col, exRow, exCol;
+                row = Math.floor(this.playerY / cellSize);
+                col = Math.floor(this.playerX / cellSize);
+                exRow = Math.floor((this.playerY + this.playerSize - 1) / cellSize);
+                exCol = Math.floor((this.playerX + this.playerSize - 1) / cellSize);
+                var deltaMove = 5;
+                if (this.controls.up) {
+                    this.playerY -= deltaMove;
+                    if (this.playerY < 0) {
+                        this.playerY = 0;
+                    }
+                    if (row > 0 && this.horWalls[row - 1][col] == 1 && this.playerY < row * cellSize) {
+                        this.playerY = row * cellSize;
+                    }
+                    if (exCol != col && row > 0) {
+                        if ((this.horWalls[row - 1][exCol] == 1 || this.verWalls[row - 1][col] == 1)&& this.playerY < row * cellSize) {
+                            this.playerY = row * cellSize;
+                        }
+                    }
+                }
+                if (this.controls.down) {
+                    this.playerY += deltaMove;
+                    if (this.playerY > this.map.height - this.playerSize) {
+                        this.playerY = this.map.height - this.playerSize;
+                    }
+                    if (this.playerY + this.playerSize > (row + 1) * cellSize && this.horWalls[row][col] == 1) {
+                        this.playerY = (row + 1) * cellSize - this.playerSize;
+                    }
+                    if (exCol != col) {
+                        if (this.playerY + this.playerSize > (row + 1) * cellSize && (this.horWalls[row][exCol] == 1 || this.verWalls[row + 1][col] == 1)) {
+                            this.playerY = (row + 1) * cellSize - this.playerSize;
+                        }
+                    }
+                }
+                if (this.controls.left) {
+                    this.playerX -= deltaMove;
+                    if (this.playerX < 0) {
+                        this.playerX = 0;
+                    }
+                    if (col > 0 && this.playerX < col * cellSize && this.verWalls[row][col - 1] == 1) {
+                        this.playerX = col * cellSize;
+                    }
+                    if (exRow != row && col > 0) {
+                        if (this.playerX < col * cellSize && (this.verWalls[exRow][col - 1] == 1 || this.horWalls[row][col - 1] == 1)) {
+                            this.playerX = col * cellSize;
+                        }
+                    }
+                }
+                if (this.controls.right) {
+                    this.playerX += deltaMove;
+                    if (this.playerX > this.map.width - this.playerSize) {
+                        this.playerX = this.map.width - this.playerSize;
+                    }
+                    if (this.playerX + this.playerSize > (col + 1) * cellSize && this.verWalls[row][col] == 1) {
+                        this.playerX = (col + 1) * cellSize - this.playerSize;
+                    }
+                    if (exRow != row) {
+                        if (this.playerX + this.playerSize > (col + 1) * cellSize && (this.verWalls[exRow][col] == 1 || this.verWalls[row][col + 1] == 1)) {
+                            this.playerX = (col + 1) * cellSize - this.playerSize;
+                        }
+                    } 
+                }
+            }
+            
+            game.prototype.gameLoop = function() {
+                this.move();
+            }
+            
+            game.prototype.render = function() {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                var view = this.calculateViewport();
+                this.drawPlayer(view.left, view.top);
+                this.drawMap(view.left, view.top);
+                var _this = this;
+                requestAnimationFrame(function(){
+                    _this.render();
+                });
+            }
+            
+            game.prototype.play = function() {
+                var _this = this;
+                this.render();
+                setInterval(function() {
+                    _this.gameLoop();
+                }, 40);
+            }
+            
+            var g;
+            function initGame(){
+                g = new game('canvas', cols, rows, cellSize);
+                g.init();
+                g.setPlayerImage(document.getElementById('player'));
+                g.play();
+                window.addEventListener("keydown", function(e){
+                    switch (e.keyCode) {
+                        case 37: // left arrow
+                            g.controls.left = true;
+                            break;
+                        case 38: // up arrow
+                            g.controls.up = true;
+                            break;
+                        case 39: // right arrow
+                            g.controls.right = true;
+                            break;
+                        case 40: // down arrow
+                            g.controls.down = true;
+                            break;
+                    }
+                }, false);
+                window.addEventListener("keyup", function(e){
+                    switch (e.keyCode) {
+                        case 37: // left arrow
+                            g.controls.left = false;
+                            break;
+                        case 38: // up arrow
+                            g.controls.up = false;
+                            break;
+                        case 39: // right arrow
+                            g.controls.right = false;
+                            break;
+                        case 40: // down arrow
+                            g.controls.down = false;
+                            break;
+                    }
+                }, false);
+            }
+        </script>
+    </head>
+    <body onload="initGame();">
+        <canvas style="display:block; margin: 30px auto;border: solid 2px #000;" id="canvas" width="800" height="600"/>
+        <img src="player.png" id="player" style="display:none;"/>
+    </body>
+</html>
+
