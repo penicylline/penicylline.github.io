@@ -1,0 +1,104 @@
+<html>
+	<head>
+		<title>Random now</title>
+		<style type="text/css">
+		#wrapper {
+			width: 700px;
+			margin: 100 auto;
+		}
+		#settings {
+			margin-bottom: 30px;
+			text-align: center;
+		}
+		#settings input, #settings button {
+			text-align: center;
+			font-size: 30px;
+			font-weight: bold;
+		}
+		#settings input {
+			width: 30%;
+			margin: 0 5%;
+		}
+		.clear {
+			clear: both;
+		}
+		#settings button {
+			margin-top: 40px;
+			padding: 10 50px;
+		}
+		#result {
+			font-size: 120px;
+			color: #f00;
+			text-align: center;
+		}
+		#footer {
+			position: fixed;
+			bottom: 0;
+			text-align: center;
+			padding-bottom: 20px;
+			width: 100%;
+		}
+		</style>
+		<script>
+			function rand(min, max) {
+				return Math.round(Math.random() * (max - min) + min);
+			}
+			function displayNumbers(arr, dom, finish) {
+				var c = arr.shift();
+				dom.innerHTML = new String(c);
+				if (arr.length == 0) {
+					finish.call(this);
+					return;
+				} else {
+					setTimeout(function() {
+						displayNumbers(arr, dom, finish);
+					}, 100);
+				}
+			}
+			function runRandom() {
+				var v1 = parseInt(document.getElementById('start').value);
+				var v2 = parseInt(document.getElementById('end').value);
+				var start = Math.min(v1, v2);
+				var end = Math.max(v1, v2);
+				var displayDom = document.getElementById('result');
+				var button = document.getElementById('button');
+				button.setAttribute('disabled', 'true'); 
+				var loop = rand(3, 7);
+				var numbers = new Array();
+				for (var i = 0; i < loop; i++) {
+					for (var j = start; j <= end; j++) {
+						numbers.push(j);
+					}
+				}
+				var luckyNumber = rand(start, end);
+				for (var j = start; j <= luckyNumber; j++) {
+						numbers.push(j);
+				}
+				displayNumbers(numbers, displayDom, function() {
+					button.removeAttribute('disabled');
+				});
+			}
+			window.addEventListener('load', function() {
+				var button = document.getElementById('button');
+				button.addEventListener('click', function() {
+					runRandom();
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div id="wrapper">
+		<div id="settings">
+			<h1>GEN A RANDOM NUMBER BETWEEN</h1>
+			<input type="number" id="start" value="1" />
+			<strong>AND</strong>
+			<input type="number" id="end"  value="10" />
+			<div class="clear"></div>
+			<button id="button">Random Now</button>
+		</div>
+		<div id="result">
+		</div>
+		</div>
+		<div id="footer">Random Now &copy; 2015</div>
+	</body>
+</html>
