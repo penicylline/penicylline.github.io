@@ -1,0 +1,6 @@
+[submodule "pgnjs"]
+	path = pgnjs
+	url = https://github.com/penicylline/pgnjs.git
+[submodule "mazejs"]
+	path = mazejs
+	url = https://github.com/penicylline/mazejs.git
