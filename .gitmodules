@@ -1,9 +1,11 @@
 [submodule "pgnjs"]
 	path = pgnjs
 	url = https://github.com/penicylline/pgnjs.git
+	branch = master
 [submodule "mazejs"]
 	path = mazejs
 	url = https://github.com/penicylline/mazejs.git
+	branch = master
 [submodule "maximind"]
 	path = maximind
 	url = https://github.com/penicylline/maximind.git
