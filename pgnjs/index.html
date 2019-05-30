@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PGN parser JS</title>
+    <link rel="stylesheet" media="all" href="css/chess.css" />
+    <link rel="stylesheet" media="all" href="css/ui.css" />
+</head>
+<body>
+<div id="body">
+    <div id="body-wrapper">
+        <div>
+            <div id="chess-table">
+            </div>
+            <div class="nav">
+                <button id="btnPrev"><< Prev</button>
+                <button id="btnNext">Next >></button>
+            </div>
+        </div>
+        <div>
+            <label>Game Notation</label>
+            <textarea id="game" rows="20"></textarea>
+            <button id="btnParse">Parse this game</button>
+        </div>
+    </div>
+</div>
+<div id="footer">
+penicylline/pgnjs
+</div>
+<script src="js/common.js"></script>
+<script src="js/pieces.js"></script>
+<script src="js/move.js"></script>
+<script src="js/parser.js"></script>
+<script src="js/game.js"></script>
+<script src="js/viewer.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

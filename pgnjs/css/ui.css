@@ -1,0 +1,45 @@
+body, html {
+    height: 100%;
+}
+body:before {
+    content: "";
+    height: 100%;
+    float: left;
+    width: 0;
+    margin-top: -32767px;
+}
+
+#footer {
+    position: relative;
+    margin-top: -50px;
+    clear: both;
+    line-height: 50px;
+    text-align: center;
+    font-weight: bold;
+}
+
+#body {
+    height: auto;
+    min-height: 100%;
+}
+
+#body-wrapper {
+    overflow: hidden;
+    padding-bottom: 50px;
+}
+
+#body-wrapper > div {
+    float: left;
+    width: 50%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+#game {
+    width: 100%;
+    resize: none;
+}
+
+button {
+    padding: 5px 12px 4px;
+}
