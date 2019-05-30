@@ -4,3 +4,6 @@
 [submodule "mazejs"]
 	path = mazejs
 	url = https://github.com/penicylline/mazejs.git
+[submodule "maximind"]
+        path = maximind
+        url = https://github.com/penicylline/maximind.git
