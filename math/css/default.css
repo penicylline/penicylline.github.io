@@ -1,0 +1,19 @@
+html, body {
+    width: 100%;
+}
+
+.row {
+    width: 100%;
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 1em;
+}
+
+#btnCheck {
+    font-size: 2em;
+}
+
+#answer{
+    font-size: 2em;
+    width: 2em;
+}
