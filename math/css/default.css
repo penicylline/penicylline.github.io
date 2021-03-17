@@ -5,15 +5,22 @@ html, body {
 .row {
     width: 100%;
     text-align: center;
-    font-size: 2em;
     margin-bottom: 1em;
 }
 
-#btnCheck {
+.red {
+    color: #ff0000;
+}
+
+.game {
     font-size: 2em;
 }
 
+#btnCheck {
+    font-size: 1.5em;
+}
+
 #answer{
-    font-size: 2em;
-    width: 2em;
+    font-size: 1em;
+    width: 1.5em;
 }
