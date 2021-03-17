@@ -1,25 +1,29 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Math</title>
     <meta name="description" content="Math 4 Kids" />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="./css/default.css" />
 </head>
 <body>
-    <div class="row">
-        question: <span id="qCount"></span>
-        incorrect:<span id="wrongCounts"></span>
+    <div id="board">
+        <div class="row">
+            <label><b>Subtraction</b> <input type="checkbox" id="chkSub"></label><br/>
+            <b>Question:</b> <span id="qCount"></span><br/>
+            <b>Incorrect:</b> <span id="wrongCounts" class="red">0</span>
+        </div>
+        <div class="row game">
+            <span id="beforeQ"></span>
+            <input type="number" id="answer" />
+            <span id="afterQ"></span>
+            <br/>
+        </div>
+        <div class="row">
+            <button id="btnCheck">Check</button>
+        </div>
     </div>
-    <div class="row">
-        <span id="question"></span>
-        <input type="number" id="answer" />
-        <br/>
-    </div>
-    <div class="row">
-        <button id="btnCheck">Check</button>
-    </div>
-    
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="./js/default.js"></script>
 </body>
