@@ -22,5 +22,10 @@ html, body {
 
 #answer{
     font-size: 1em;
-    width: 1.5em;
+    width: 2.5em;
+    min-width: 2.5em;
+}
+
+#panelSettings {
+    display: none;
 }
