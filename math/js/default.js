@@ -1,19 +1,30 @@
-var TestConfig = {
-    max: 50,
-    currentQuestion: null,
-    questionCount: 0,
-    wrongAnswers: 0
+var Common = {
+    TEST_CONFIG_KEY: 'test_config',
+    TEST_STATE_KEY: 'test_state'
 }
 
 var QuestionType = {
     SUM_2: 'SUM_2',
+    SUM_3: 'SUM_3',
     SUM_1: 'SUM_1',
     SUB_1: 'SUB_1',
     SUB_2: 'SUB_2'
 };
 
-var QuestionTypeListFull = [QuestionType.SUM_1, QuestionType.SUM_2, QuestionType.SUB_1, QuestionType.SUB_2];
+var QuestionTypeListFull = [QuestionType.SUM_1, QuestionType.SUM_2, QuestionType.SUM_3, QuestionType.SUB_1, QuestionType.SUB_2];
 var QuestionTypeList = [QuestionType.SUM_1, QuestionType.SUM_2];
+
+var TestConfig = {
+    max: 1000,
+    min: 50,
+    questionTypes: QuestionTypeListFull
+}
+
+var TestState = {
+    currentQuestion: null,
+    questionCount: 0,
+    wrongAnswers: 0
+}
 
 var QuestionData = function(type) {
     this.type = type;
@@ -24,10 +35,11 @@ var QuestionData = function(type) {
     this.result = null;
 }
 
+// sum 1
 var Sum1Question = function() {
     this.data = new QuestionData(QuestionType.SUM_1);
-    this.data.data[0] = Math.round(Math.random() * TestConfig.max / 2);
-    this.data.data[1] = Math.round(Math.random() * TestConfig.max / 2);
+    this.data.data[0] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 2 + TestConfig.min);
+    this.data.data[1] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 2 + TestConfig.min);
     this.data.correctAnswer = this.data.data[0] + this.data.data[1];
 }
 
@@ -36,10 +48,11 @@ Sum1Question.prototype.render = function(container1, container2) {
     container2.text('');
 }
 
+// sum 2
 var Sum2Question = function() {
     this.data = new QuestionData(QuestionType.SUM_2);
-    this.data.data[0] = Math.round(Math.random() * TestConfig.max / 2);
-    this.data.data[1] = Math.round(Math.random() * TestConfig.max / 2) + this.data.data[0];
+    this.data.data[0] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 2 + TestConfig.min);
+    this.data.data[1] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 2 + TestConfig.min) + this.data.data[0];
     this.data.correctAnswer = this.data.data[1] - this.data.data[0];
 }
 
@@ -47,11 +60,26 @@ Sum2Question.prototype.render = function(container1, container2) {
     container1.text("".concat(this.data.data[0]).concat(" + "));
     container2.text(" = ".concat(this.data.data[1]));
 }
+ // sum 3
 
+var Sum3Question = function() {
+    this.data = new QuestionData(QuestionType.SUM_3);
+    this.data.data[0] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 3 + TestConfig.min);
+    this.data.data[1] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 3 + TestConfig.min);
+    this.data.data[2] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 3 + TestConfig.min);
+    this.data.correctAnswer = this.data.data[0] + this.data.data[1] + this.data.data[2];
+}
+
+Sum3Question.prototype.render = function(container1, container2) {
+    container1.text("".concat(this.data.data[0]).concat(" + ").concat(this.data.data[1]).concat(" + ").concat(this.data.data[2]));
+    container2.text(" = ".concat(this.data.data[1]));
+}
+
+// sub 1
 var Sub1Question = function() {
     this.data = new QuestionData(QuestionType.SUB_1);
-    this.data.data[0] = Math.round(Math.random() * TestConfig.max / 2);
-    this.data.data[1] = Math.round(Math.random() * TestConfig.max / 2) + this.data.data[0];
+    this.data.data[0] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 2 + TestConfig.min);
+    this.data.data[1] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 2 + TestConfig.min) + this.data.data[0];
     this.data.correctAnswer = this.data.data[1] - this.data.data[0];
 }
 
@@ -62,9 +90,9 @@ Sub1Question.prototype.render = function(container1, container2) {
 
 
 var Sub2Question = function() {
-    this.data = new QuestionData(QuestionType.SUB_1);
-    this.data.data[0] = Math.round(Math.random() * TestConfig.max / 2);
-    this.data.data[1] = Math.round(Math.random() * TestConfig.max / 2) + this.data.data[0];
+    this.data = new QuestionData(QuestionType.SUB_2);
+    this.data.data[0] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 2 + TestConfig.min);
+    this.data.data[1] = Math.round(Math.random() * (TestConfig.max - TestConfig.min) / 2 + TestConfig.min) + this.data.data[0];
     this.data.correctAnswer = this.data.data[1] - this.data.data[0];
 }
 
@@ -74,17 +102,16 @@ Sub2Question.prototype.render = function(container1, container2) {
 }
 
 function randomQuestion() {
-    var typeList = QuestionTypeList;
-    if ($('#chkSub').is(':checked')) {
-        typeList = QuestionTypeListFull;
-    }
-    var rand = Math.ceil(Math.random() * typeList.length);
-    var qType = typeList[rand];
+    const typeList = TestConfig.questionTypes;
+    const rand = Math.ceil(Math.random() * typeList.length);
+    const qType = typeList[rand];
     switch(qType) {
         case QuestionType.SUM_1:
             return new Sum1Question();
         case QuestionType.SUM_2:
             return new Sum2Question();
+        case QuestionType.SUM_3:
+            return new Sum3Question();
         case QuestionType.SUB_1:
             return new Sub1Question();
         case QuestionType.SUB_2:
@@ -96,27 +123,49 @@ function randomQuestion() {
 function nextQuestion() {
     var sum = randomQuestion();
     sum.render($('#beforeQ'), $('#afterQ'));
-    TestConfig.currentQuestion = sum;
-    TestConfig.questionCount++;
-    $('#qCount').text(TestConfig.questionCount);
+    TestState.currentQuestion = sum;
+    TestState.questionCount++;
+    $('#qCount').text(TestState.questionCount);
     $('#answer').val('');
     $('#answer').focus();
 }
 
+function loadConfig() {
+    if (window.localStorage) {
+        let config = window.localStorage.getItem(Common.TEST_CONFIG_KEY);
+        if (config) {
+            TestConfig = JSON.parse(config)
+        }
+        let state = window.localStorage.getItem(Common.TEST_STATE_KEY);
+        if (state) {
+            TestState = JSON.parse(state)
+        }
+    }
+}
+
+function saveState() {
+    if (window.localStorage) {
+        const str = JSON.stringify(TestState);
+        console.log(str);
+        window.localStorage.setItem(Common.TEST_STATE_KEY, str);
+    }
+}
+
 $(document).ready(function (){
+    loadConfig();
     nextQuestion();
 
     $('#btnCheck').click(function() {
-        if (TestConfig.currentQuestion == null) {
+        if (TestState.currentQuestion == null) {
             return;
         }
         var val = $('#answer').val();
-        if (TestConfig.currentQuestion.data.correctAnswer == val) {
+        if (TestState.currentQuestion.data.correctAnswer == val) {
             alert('Correct!!!');
             nextQuestion();
         } else {
-            TestConfig.wrongAnswers++;
-            $('#wrongCounts').text(TestConfig.wrongAnswers)
+            TestState.wrongAnswers++;
+            $('#wrongCounts').text(TestState.wrongAnswers)
             alert('Wrong!!!');
         }
     });
