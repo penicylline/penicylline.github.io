@@ -166,7 +166,9 @@ function resetState() {
 
 $(document).ready(function (){
     loadConfig();
-    nextQuestion();
+    if (!TestState.currentQuestion) {
+        nextQuestion();
+    }
 
     $('#btnCheck').click(function() {
         if (TestState.currentQuestion == null) {
