@@ -120,13 +120,46 @@ function randomQuestion() {
     return new Sum1Question();
 }
 
+function restoreQuestion(data) {
+    let question = new Sum1Question();
+    switch(data.type) {
+        case QuestionType.SUM_1:
+            question = new Sum1Question();
+            break;
+        case QuestionType.SUM_2:
+            question = new Sum2Question();
+            break;
+        case QuestionType.SUM_3:
+            question = new Sum3Question();
+            break;
+        case QuestionType.SUB_1:
+            question = new Sub1Question();
+            break;
+        case QuestionType.SUB_2:
+            question = new Sub2Question();
+            break;
+    }
+    question.data = data;
+
+    return question;
+}
+
 function nextQuestion() {
-    const newQuestion = randomQuestion();
-    newQuestion.render($('#beforeQ'), $('#afterQ'));
-    TestState.currentQuestion = newQuestion;
+    TestState.currentQuestion = randomQuestion();
     TestState.questionCount++;
     saveState();
+
+    renderCurrentQuestion();
     $('#qCount').text(TestState.questionCount);
+}
+
+function renderCurrentQuestion() {
+    if (null == TestState.currentQuestion) {
+        return;
+    }
+
+    TestState.currentQuestion.render($('#beforeQ'), $('#afterQ'));
+
     $('#answer').val('');
     $('#answer').focus();
 }
@@ -140,6 +173,7 @@ function loadConfig() {
         let state = window.localStorage.getItem(Common.TEST_STATE_KEY);
         if (state) {
             TestState = JSON.parse(state)
+            TestState.currentQuestion = restoreQuestion(TestState.currentQuestion.data);
         }
     }
     $('#qCount').text(TestState.questionCount);
@@ -166,8 +200,10 @@ function resetState() {
 
 $(document).ready(function (){
     loadConfig();
-    if (!TestState.currentQuestion) {
+    if (null == TestState.currentQuestion) {
         nextQuestion();
+    } else {
+        renderCurrentQuestion();
     }
 
     $('#btnCheck').click(function() {
